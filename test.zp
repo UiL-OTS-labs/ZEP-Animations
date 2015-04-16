@@ -1,0 +1,363 @@
+import std_display;
+import animation_utility;
+
+start()
+{
+}
+
+NormalWindow win
+{
+    init()
+    {
+        size = 1000, 800;
+        position = ALIGN_CENTER, ALIGN_CENTER;
+	background = color:dimgray;
+        
+        show();
+        show_page(page);
+    }
+}
+
+Page page
+{
+    on_event:close()
+    {
+        terminate;
+    }
+ 
+	VerticalLayout layout
+    	{		
+		CanvasGadget background
+		{
+			init()
+			{
+				size = int(win.width), int(win.height)-200;
+				fill_pattern_color = color:lightgray;
+
+				offset_x = width/2;
+				offset_y = height/2;
+
+				is_visible = true;
+			}
+
+			LineShape xaxis
+			{
+				init()
+				{
+					x0=-background.width/2;
+					y0=0;
+					x1=background.width/2;
+					y1=0;
+					line_width = 1;
+ 
+                				line_pattern_color = color:red;
+         					is_visible = true;
+				}
+			}
+
+			LineShape yaxis
+			{
+				init()
+				{
+					y0=-background.height/2;
+					x0=0;
+					y1=background.height/2;
+					x1=0;
+					line_width = 1;
+ 
+                				line_pattern_color = color:red;
+         					is_visible = true;
+				}
+			}
+
+			ImageShape image
+			{
+				init()
+				{
+					image = "example_image.svg";
+
+					width = image_width*0.5;
+					height = image_height*0.5;
+					
+					calculate_offset();
+
+					is_visible = true;
+				}
+
+				AnimationFrame origin;
+				AnimationFrame[..] animation;
+
+				int start_animation(string path_to_animation, time tref)
+				{
+					int expected_finish_frame;
+					animation.load(path_to_animation,true,1);
+					expected_finish_frame = animate_with_at(this, animation, tref);
+					return expected_finish_frame;
+				}
+
+				on_event:pre_update()
+				{
+					println( "~~~~~~~");
+					println("relative_frame: " + relative_frame);
+					println("x: " + x);
+					println("y: " + y);
+					println("width: " + width);
+					println("height: " + width);
+					println("alpha: " + alpha);
+					println("image: " + image);
+
+					if(relative_frame == 0)
+						origin = make_snapshot(this);
+					update_animation(this, this.animation, origin);
+
+					calculate_offset();
+				}
+
+				void calculate_offset()
+				{
+					//Here so there is not offset when increasing the width/height:
+					offset_x = -width/2;
+					offset_y = -height/2;
+				}
+				on_event:pre_finish()
+				{
+					if(is_being_animated(this, this.animation)) 
+						println("Animation not yet complete: " + object_name);
+					else
+						animation.size = 0;
+				}
+
+				
+			}
+		}
+		HorizontalLayout buttons
+		{
+			init()
+			{
+				spacing = 5;
+			}	
+
+			ButtonGadget left
+			{
+				init()
+				{
+					text = "←";
+					fill_pattern_color = color:yellow;
+				}
+
+				activate()
+				{
+					string path_to_animation = stimuli_dir() + "/animations/left.csv";
+					time tref = now()+10ms;
+					int finish_frame = background.image.start_animation(path_to_animation, tref);
+					background.image.stop_fr(finish_frame);
+				}	
+			}
+
+			VerticalLayout
+			{
+				ButtonGadget up
+				{
+					init()
+					{
+						text = "↑";
+						fill_pattern_color = color:yellow;
+					}
+
+					activate()
+					{
+						string path_to_animation = stimuli_dir() + "/animations/up.csv";
+						time tref = now()+10ms;
+						int finish_frame = background.image.start_animation(path_to_animation, tref);
+						background.image.stop_fr(finish_frame);
+					}	
+				}
+
+				ButtonGadget right
+				{
+					init()
+					{
+						text = "↓";
+						fill_pattern_color = color:yellow;
+					}
+
+					activate()
+					{
+						string path_to_animation = stimuli_dir() + "/animations/down.csv";
+						time tref = now()+10ms;
+						int finish_frame = background.image.start_animation(path_to_animation, tref);
+						background.image.stop_fr(finish_frame);
+					}	
+				}
+			}
+
+			ButtonGadget right
+			{
+				init()
+				{
+					text = "→";
+					fill_pattern_color = color:yellow;
+				}
+
+				activate()
+				{
+					string path_to_animation = stimuli_dir() + "/animations/right.csv";
+					time tref = now()+10ms;
+					int finish_frame = background.image.start_animation(path_to_animation, tref);
+					background.image.stop_fr(finish_frame);
+				}	
+			}
+
+			ButtonGadget rotate_cw
+			{
+				init()
+				{
+					text = "↻";
+					fill_pattern_color = color:yellow;
+				}
+
+				activate()
+				{
+					string path_to_animation = stimuli_dir() + "/animations/rotate_cw.csv";
+					time tref = now()+10ms;
+					int finish_frame = background.image.start_animation(path_to_animation, tref);
+					background.image.stop_fr(finish_frame);
+				}	
+			}
+
+			ButtonGadget rotate_cc
+			{
+				init()
+				{
+					text = "↺";
+					fill_pattern_color = color:yellow;
+				}
+
+				activate()
+				{
+					string path_to_animation = stimuli_dir() + "/animations/rotate_cc.csv";
+					time tref = now()+10ms;
+					int finish_frame = background.image.start_animation(path_to_animation, tref);
+					background.image.stop_fr(finish_frame);
+				}	
+			}
+
+			VerticalLayout
+			{
+				ButtonGadget increase_width
+				{
+					init()
+					{
+						text = "width+";
+						fill_pattern_color = color:yellow;
+					}
+
+					activate()
+					{
+						string path_to_animation = stimuli_dir() + "/animations/width_incr.csv";
+						time tref = now()+10ms;
+						int finish_frame = background.image.start_animation(path_to_animation, tref);
+						background.image.stop_fr(finish_frame);
+					}	
+				}
+
+				ButtonGadget decrease_width
+				{
+					init()
+					{
+						text = "width-";
+						fill_pattern_color = color:yellow;
+					}
+
+					activate()
+					{
+						string path_to_animation = stimuli_dir() + "/animations/width_decr.csv";
+						time tref = now()+10ms;
+						int finish_frame = background.image.start_animation(path_to_animation, tref);
+						background.image.stop_fr(finish_frame);
+					}	
+				}
+			}
+			
+
+			VerticalLayout
+			{
+				ButtonGadget increase_height
+				{
+					init()
+					{
+						text = "height+";
+						fill_pattern_color = color:yellow;
+					}
+
+					activate()
+					{
+						string path_to_animation = stimuli_dir() + "/animations/height_incr.csv";
+						time tref = now()+10ms;
+						int finish_frame = background.image.start_animation(path_to_animation, tref);
+						background.image.stop_fr(finish_frame);
+					}	
+				}
+
+				ButtonGadget decrease_height
+				{
+					init()
+					{
+						text = "height-";
+						fill_pattern_color = color:yellow;
+					}
+
+					activate()
+					{
+						string path_to_animation = stimuli_dir() + "/animations/height_decr.csv";
+						time tref = now()+10ms;
+						int finish_frame = background.image.start_animation(path_to_animation, tref);
+						background.image.stop_fr(finish_frame);
+					}	
+				}
+			}
+			
+
+			ButtonGadget info
+			{
+				init()
+				{
+					text = "?";
+					fill_pattern_color = color:yellow;
+				}
+				activate()
+				{
+					background.image.start(now(), 17ms);
+				}
+			}
+
+			TextFieldGadget custom_animation
+			{
+				init()
+				{
+					text="jump.csv";
+					size = 100, 50;
+				}
+			}
+
+			ButtonGadget play_custom
+			{
+				init()
+				{
+					text = "►";
+					fill_pattern_color = color:yellow;
+				}
+				activate()
+				{
+					string path_to_animation = stimuli_dir() + "/animations/" + custom_animation.text;
+					time tref = now()+10ms;
+					int finish_frame = background.image.start_animation(path_to_animation, tref);
+					background.image.stop_fr(finish_frame);
+				}
+			}
+		}
+		
+
+
+	}
+}
